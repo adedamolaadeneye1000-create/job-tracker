@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' data: blob:; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'">
+<title>Job Hunt</title>
+<meta name="description" content="Personal job application tracker: applications, trends, feedback and a plan to an offer.">
+<meta name="theme-color" content="#13203A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Shown until config.js has your Supabase details -->
+<main class="gate" id="setupView" hidden>
+  <div class="card">
+    <p class="eyebrow">One step left</p>
+    <h1>Connect your database</h1>
+    <ol>
+      <li>Open your Supabase project and click <b>Connect</b>.</li>
+      <li>Copy the Project URL and the publishable key.</li>
+      <li>Paste them into <code>config.js</code> and upload it again.</li>
+    </ol>
+    <p class="muted small">The README has the full steps.</p>
+  </div>
+</main>
+
+<!-- Sign in -->
+<main class="gate" id="signinView" hidden>
+  <div class="card">
+    <p class="eyebrow">Application tracker</p>
+    <h1 class="js-title">Job Hunt</h1>
+    <form id="signinForm" novalidate>
+      <label>Email<input class="field" type="email" id="si-email" autocomplete="username" required></label>
+      <label>Password<input class="field" type="password" id="si-password" autocomplete="current-password" required></label>
+      <button class="btn primary" type="submit" id="si-submit">Sign in</button>
+    </form>
+    <button class="linkbtn" type="button" id="si-forgot">Forgot your password?</button>
+    <p class="msg" id="si-msg" hidden></p>
+  </div>
+</main>
+
+<!-- Set a new password after following a reset email -->
+<main class="gate" id="recoverView" hidden>
+  <div class="card">
+    <p class="eyebrow">Reset password</p>
+    <h1>Choose a new password</h1>
+    <form id="recoverForm" novalidate>
+      <label>New password<input class="field" type="password" id="rc-password" autocomplete="new-password" minlength="8" required></label>
+      <button class="btn primary" type="submit">Save password</button>
+    </form>
+    <p class="msg" id="rc-msg" hidden></p>
+  </div>
+</main>
+
+<!-- The tracker -->
+<div id="appView" hidden>
+<div class="wrap">
+  <header class="top">
+    <div class="intro">
+      <p class="eyebrow" id="goalLine">Application tracker</p>
+      <h1 class="js-title">Job Hunt</h1>
+      <p class="lede">Log every application here. The charts, feedback and plan below update as you go, so you can see what is working and where to push next.</p>
+    </div>
+    <div class="countdown" aria-live="polite">
+      <div class="cd-row">
+        <span class="cd-num" id="cdDays">—</span>
+        <span class="cd-label"><b id="cdGoal">days to your goal</b><span class="muted small" id="cdWeeks">Counting the weeks…</span></span>
+      </div>
+      <div class="weeks" id="weekStrip" role="img" aria-label="Weeks of the plan"></div>
+      <div class="wk-legend"><span><i class="hit"></i>Hit weekly target</span><span><i class="miss"></i>Missed</span><span><i class="now"></i>This week</span><span><i></i>Ahead</span></div>
+    </div>
+  </header>
+
+  <nav class="jump" aria-label="Sections">
+    <a href="#overview">Overview</a>
+    <a href="#applications">Applications</a>
+    <a href="#feedback">Feedback</a>
+    <a href="#tracks">Career tracks</a>
+    <a href="#plan">Plan</a>
+    <a href="#data">Your data</a>
+    <span class="spacer"></span>
+    <button class="btn primary" id="addTop" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>Add application</button>
+  </nav>
+
+  <div class="banner" id="storeBanner" hidden></div>
+
+  <section id="overview" aria-labelledby="ov-h">
+    <div class="sec-head"><div class="t"><p class="eyebrow">Overview</p><h2 id="ov-h">Where things stand</h2></div></div>
+    <div class="kpis" id="kpis">
+      <div class="kpi"><span class="eyebrow">Sent</span><span class="v">—</span><span class="s">applications submitted</span></div>
+      <div class="kpi"><span class="eyebrow">Heard back</span><span class="v">—</span><span class="s">replies of any kind</span></div>
+      <div class="kpi"><span class="eyebrow">Interviews</span><span class="v">—</span><span class="s">reached interview stage</span></div>
+      <div class="kpi"><span class="eyebrow">Offers</span><span class="v">—</span><span class="s">offers received</span></div>
+      <div class="kpi"><span class="eyebrow">This week</span><span class="v">—</span><span class="s">against your weekly target</span></div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div><h3>Applications per week</h3><p class="caption" id="weekCaption">Each bar is one week, Monday to Sunday. The dashed line is your weekly target.</p></div>
+        <div class="chart" id="weekChart"></div>
+      </div>
+      <div class="panel">
+        <div><h3>Needs attention</h3><p class="caption">Follow-ups, deadlines and statuses to confirm. Tap one to update it.</p></div>
+        <ul class="att" id="attention"><li class="empty">Loading your applications…</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="applications" aria-labelledby="ap-h">
+    <div class="sec-head">
+      <div class="t"><p class="eyebrow">Applications</p><h2 id="ap-h">Every job you go for</h2></div>
+      <button class="btn primary" id="addMain" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>Add application</button>
+    </div>
+    <div class="toolbar">
+      <input type="search" id="q" placeholder="Search company, role or reference" aria-label="Search applications">
+      <select id="fStatus" aria-label="Filter by status">
+        <option value="all">All statuses</option>
+        <option value="active">In progress</option>
+        <option value="todo">To apply</option>
+        <option value="offers">Offers</option>
+        <option value="closed">Closed</option>
+      </select>
+      <select id="fTrack" aria-label="Filter by track"><option value="all">All tracks</option></select>
+      <select id="fSort" aria-label="Sort applications">
+        <option value="recent">Newest first</option>
+        <option value="closing">Closing soonest</option>
+        <option value="stage">Furthest stage</option>
+      </select>
+      <span class="count" id="countLbl"></span>
+    </div>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Role and company</th><th>Track</th><th>Status</th><th>Applied</th><th>Closes</th><th>Next step</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="6" class="empty">Loading your applications…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="feedback" aria-labelledby="fb-h">
+    <div class="sec-head"><div class="t"><p class="eyebrow">Feedback and trends</p><h2 id="fb-h">What the results are telling you</h2></div></div>
+    <div class="grid2 even">
+      <div class="panel">
+        <div><h3>Your funnel</h3><p class="caption">How far your submitted applications get. Each step is a share of everything sent.</p></div>
+        <div class="bars" id="funnel"></div>
+      </div>
+      <div class="panel">
+        <div><h3>Where applications stop</h3><p class="caption">Closed applications, grouped by the last stage they reached.</p></div>
+        <div class="drop" id="drop"></div>
+        <p class="verdict" id="verdict"></p>
+      </div>
+    </div>
+    <div class="grid2 even">
+      <div class="panel">
+        <div><h3>Results by track</h3><p class="caption">Which kinds of role reply to you most.</p></div>
+        <div class="legend"><span><i class="lg-sent"></i>Sent</span><span><i class="lg-heard"></i>Heard back</span></div>
+        <div class="bars" id="byTrack"></div>
+      </div>
+      <div class="panel">
+        <div><h3>Feedback log</h3><p class="caption">Everything employers told you, newest first. Add it in each application's Feedback box.</p></div>
+        <ul class="fb-list" id="fbList"></ul>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="sec-head">
+        <div class="t"><h3>Get a second opinion</h3><p class="caption">Copy a plain-text summary of your whole search to paste into an email to a careers adviser or mentor.</p></div>
+        <button class="btn" id="copySummary" type="button">Copy summary</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="tracks" aria-labelledby="tr-h">
+    <div class="sec-head"><div class="t"><p class="eyebrow">Career tracks</p><h2 id="tr-h">Roles that fit your background</h2><p class="muted" id="tracksLede">Highlighted tracks hire fastest, so they are your best chance of an offer before your goal date. Run graduate schemes alongside them.</p></div></div>
+    <div class="tracks" id="trackCards"></div>
+  </section>
+
+  <section id="plan" aria-labelledby="pl-h">
+    <div class="sec-head">
+      <div class="t"><p class="eyebrow">Plan</p><h2 id="pl-h">The plan to an offer</h2></div>
+      <div class="plan-tools">
+        <label for="target">Weekly target <input class="field mono" type="number" id="target" min="1" max="30" step="1" value="8"> applications</label>
+      </div>
+    </div>
+    <div class="phases" id="phases"></div>
+    <div class="panel">
+      <h3>Where to search</h3>
+      <div class="links">
+        <a href="https://www.gradcracker.com" target="_blank" rel="noopener">Gradcracker</a>
+        <a href="https://targetjobs.co.uk" target="_blank" rel="noopener">TARGETjobs</a>
+        <a href="https://www.brightnetwork.co.uk" target="_blank" rel="noopener">Bright Network</a>
+        <a href="https://uk.indeed.com" target="_blank" rel="noopener">Indeed UK</a>
+        <a href="https://www.linkedin.com/jobs" target="_blank" rel="noopener">LinkedIn Jobs</a>
+        <a href="https://www.jobs.nhs.uk" target="_blank" rel="noopener">NHS Jobs</a>
+        <a href="https://www.civilservicejobs.service.gov.uk" target="_blank" rel="noopener">Civil Service Jobs</a>
+        <a href="https://www.prospects.ac.uk/graduate-jobs" target="_blank" rel="noopener">Prospects</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="data" aria-labelledby="dt-h">
+    <div class="sec-head"><div class="t"><p class="eyebrow">Your data</p><h2 id="dt-h">Backup and account</h2></div></div>
+    <div class="panel">
+      <p class="small muted">Your applications are stored in your own Supabase database. Download a backup now and then, and use Import to load a backup or a file from another tracker.</p>
+      <div class="data-actions">
+        <button class="btn" id="exportBtn" type="button">Download backup</button>
+        <button class="btn" id="importBtn" type="button">Import applications</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
+        <span class="spacer"></span>
+        <span class="who" id="whoLbl"></span>
+        <button class="btn small" id="signOut" type="button">Sign out</button>
+      </div>
+    </div>
+  </section>
+</div>
+</div>
+
+<div class="overlay" id="editor" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="edTitle">
+    <div class="sheet-head">
+      <div><p class="eyebrow" id="edEyebrow">New application</p><h2 id="edTitle">Add application</h2></div>
+      <button class="btn" type="button" id="edClose" aria-label="Close">Close</button>
+    </div>
+    <p class="note-check" id="edCheck" hidden></p>
+    <form class="form" id="edForm" autocomplete="off">
+      <label>Company<input class="field" id="f-company" required></label>
+      <label>Role<input class="field" id="f-role" required></label>
+      <label>Track<select class="field" id="f-track"></select></label>
+      <label>Location<input class="field" id="f-location" placeholder="Hull, London, remote…"></label>
+      <label>Status<select class="field" id="f-status"></select></label>
+      <label>Furthest stage reached<select class="field" id="f-furthest"></select><span class="hint">Keeps your progress when a role closes.</span></label>
+      <label>Date applied<input class="field" type="date" id="f-applied"></label>
+      <label>Closing date<input class="field" type="date" id="f-closing"></label>
+      <label>Found on<input class="field" id="f-source" list="sources" placeholder="Handshake, LinkedIn…"></label>
+      <label>CV used<select class="field" id="f-cv"></select></label>
+      <label>Job reference<input class="field mono" id="f-ref" placeholder="e.g. R210016"></label>
+      <label>Salary<input class="field" id="f-salary" placeholder="e.g. £30,000"></label>
+      <label class="full">Job link<input class="field" type="url" id="f-url" placeholder="https://"></label>
+      <label>Next step<input class="field" id="f-next" placeholder="e.g. Chase recruiter"></label>
+      <label>Next step date<input class="field" type="date" id="f-nextdate"></label>
+      <label class="full">Feedback from the employer<textarea class="field" id="f-feedback" placeholder="What they said after a test, interview or rejection"></textarea></label>
+      <label class="full">Notes<textarea class="field" id="f-notes" placeholder="Anything to remember"></textarea></label>
+      <datalist id="sources"><option value="Handshake"><option value="LinkedIn"><option value="Indeed"><option value="Company website"><option value="Gradcracker"><option value="NHS Jobs"><option value="Referral"><option value="Recruiter"></datalist>
+    </form>
+    <div class="sheet-foot">
+      <button class="btn danger" type="button" id="edDelete" hidden>Delete</button>
+      <span></span>
+      <div class="right">
+        <button class="btn" type="button" id="edCancel">Cancel</button>
+        <button class="btn primary" type="button" id="edSave">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="config.js"></script>
+<script src="content.js"></script>
+<script src="vendor/supabase-2.117.2.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
