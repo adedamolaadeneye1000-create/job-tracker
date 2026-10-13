@@ -741,5 +741,23 @@
   if ("serviceWorker" in navigator && location.protocol === "https:") {
     window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(err => console.warn("Offline mode unavailable", err)));
   }
+    // ---------- light / dark switch ----------
+  // Remembers your choice on this device. With nothing saved, the app follows the device setting.
+  const themeBtn = document.getElementById("themeBtn");
+  const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+  function savedTheme() { try { return localStorage.getItem("theme"); } catch { return null; } }
+  function isDark() { const t = document.documentElement.dataset.theme; return t ? t === "dark" : systemDark.matches; }
+  function applyTheme(t) {
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+    else delete document.documentElement.dataset.theme;
+    if (themeBtn) themeBtn.textContent = isDark() ? "\u2600\uFE0E Light mode" : "\u263E Dark mode";
+  }
+  if (themeBtn) themeBtn.addEventListener("click", () => {
+    const next = isDark() ? "light" : "dark";
+    try { localStorage.setItem("theme", next); } catch { /* private browsing: works until reload */ }
+    applyTheme(next);
+  });
+  systemDark.addEventListener("change", () => applyTheme(savedTheme()));
+  applyTheme(savedTheme());
   start();
 })();
