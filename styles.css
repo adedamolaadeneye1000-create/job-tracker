@@ -281,3 +281,45 @@ td .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .phase .meta{display:flex;gap:8px;align-items:center;justify-content:space-between}
 .track .eyebrow.sub{margin-bottom:4px}
 .fb-list li.empty{border:0;padding:0}
+
+/* ===== Theme part 1: coloured header banner ===== */
+.top{background:#13203A;background-image:radial-gradient(120% 140% at 100% 0%,#24407A 0%,rgba(36,64,122,0) 60%);color:#F2F4F8;border-radius:18px;padding:clamp(22px,4vw,40px);box-shadow:0 10px 30px rgba(19,32,58,.18)}
+.top .eyebrow{color:#9FB4E8}
+.top h1{color:#FFFFFF}
+.top .lede{color:#C9D3E8}
+.top .countdown{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16)}
+.top .cd-num{color:#FF8A4C}
+.top .cd-label b{color:#FFFFFF}
+.top .countdown .muted,.top .wk-legend{color:#B8C3DB}
+.top .wk{border-color:rgba(255,255,255,.28)}
+.top .wk.miss{background:#5B6782;border-color:#5B6782;opacity:1}
+.top .wk-legend i{border-color:rgba(255,255,255,.35)}
+.top .wk-legend i.miss{background:#5B6782;border-color:#5B6782;opacity:1}
+
+/* ===== Theme part 2: colour-coded numbers and funnel ===== */
+.kpi{border-color:transparent}
+.kpi:nth-child(1){background:var(--blue-soft)}
+.kpi:nth-child(1) .v{color:var(--blue)}
+.kpi:nth-child(2){background:var(--violet-soft)}
+.kpi:nth-child(2) .v{color:var(--violet)}
+.kpi:nth-child(3){background:var(--accent-soft)}
+.kpi:nth-child(3) .v{color:var(--accent-ink)}
+.kpi:nth-child(4){background:var(--good-soft)}
+.kpi:nth-child(4) .v{color:var(--good)}
+.kpi:nth-child(5){background:var(--warn-soft)}
+.kpi:nth-child(5) .v{color:var(--warn)}
+#funnel .bar-row:nth-child(1) .bar-fill{background:var(--blue)}
+#funnel .bar-row:nth-child(2) .bar-fill{background:var(--violet)}
+#funnel .bar-row:nth-child(3) .bar-fill{background:var(--accent)}
+#funnel .bar-row:nth-child(4) .bar-fill{background:var(--good)}
+
+/* ===== Theme part 3: coloured section labels and highlighted cards ===== */
+section > .sec-head .t > .eyebrow{justify-self:start;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);font-weight:500}
+#applications > .sec-head .t > .eyebrow{background:var(--blue-soft);color:var(--blue)}
+#feedback > .sec-head .t > .eyebrow{background:var(--violet-soft);color:var(--violet)}
+#tracks > .sec-head .t > .eyebrow{background:var(--good-soft);color:var(--good)}
+#plan > .sec-head .t > .eyebrow{background:var(--warn-soft);color:var(--warn)}
+.panel,.track,.phase,.tablebox{box-shadow:0 1px 2px rgba(19,32,58,.05),0 6px 18px rgba(19,32,58,.05)}
+.track.best{background:linear-gradient(180deg,var(--accent-soft) 0%,var(--panel) 140px)}
+.phase.current{background:linear-gradient(180deg,var(--accent-soft) 0%,var(--panel) 140px)}
+thead th{background:var(--soft)}
